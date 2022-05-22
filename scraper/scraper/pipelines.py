@@ -41,11 +41,20 @@ class CarCleanPipeline:
             if key == 'power':
                 item[key] = self.parse_power(item[key])
             if key == 'productionYear':
-                item[key] = item[key].replace(' ', '')
+                item[key] = self.parse_prod_year(item[key])
 
         return item
 
+    def parse_prod_year(self, year):
+        if year is None:
+            return year
+
+        return int(year.replace(' ', ''))
+
     def parse_displacement(self, data: str) -> int:
+        if data is None:
+            return data
+
         data = data.replace(' ', '')
         data = data.replace('cm³', '')
 
@@ -62,6 +71,9 @@ class CarCleanPipeline:
         return datetime.datetime.strptime(input, format)
 
     def parse_price(self, price: str) -> int:
+        if price is None:
+            return price
+
         price_tokens = price.split(' ')
         return int(price_tokens[0] + price_tokens[1])
 

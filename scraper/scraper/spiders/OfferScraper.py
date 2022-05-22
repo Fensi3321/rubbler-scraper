@@ -27,12 +27,13 @@ class OfferscraperSpider(scrapy.Spider):
 
     def start_requests(self):
         #urls = get_urls(model='prelude')
-        urls = ['https://www.olx.pl/d/motoryzacja/samochody/honda/prelude']
+        urls = ['https://www.olx.pl/d/motoryzacja/samochody/bmw/?search%5Bfilter_enum_model%5D%5B0%5D=3-as-sorozat']
 
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response, **kwargs):
+        logging.info('CURRENT URL: ' + response.request.url)
         for offer in response.css('.css-19ucd76'):
             item = OfferItem()
             price = offer.css('p.css-l0108r-Text::text').get()
@@ -50,6 +51,22 @@ class OfferscraperSpider(scrapy.Spider):
             request.meta['offer-meta'] = item
 
             yield request
+
+        next_page = response.css('div.css-4mw0p4 ul a::attr(href)').getall()
+        if len(next_page) == 5:
+            logging.info('NEXT PAGE')
+            next_url = base_url + next_page[4]
+            request = scrapy.Request(url=next_url)
+            yield request
+        elif len(next_page) == 6:
+            logging.info('NEXT PAGE')
+            next_url = base_url + next_page[5]
+            request = scrapy.Request(url=next_url)
+            yield request
+        else:
+            logging.info('NO PAGES LEFT')
+
+
 
     def parse_offer_details(self, response):
         item = response.meta['offer-meta']
