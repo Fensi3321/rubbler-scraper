@@ -7,11 +7,11 @@ import scrapy
 
 
 class OfferItem(scrapy.Item):
-    id = scrapy.Field()
     title = scrapy.Field()
     price = scrapy.Field()
     link = scrapy.Field()
     #####################
+    make = scrapy.Field()
     model = scrapy.Field()
     added = scrapy.Field()
     power = scrapy.Field()
