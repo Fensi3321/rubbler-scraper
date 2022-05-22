@@ -36,16 +36,20 @@ class CarCleanPipeline:
                 item[key] = self.parse_displacement(item[key])
             if key == 'added':
                 item[key] = self.parse_date(item[key])
+            if key == 'price':
+                item[key] = self.parse_price(item[key])
+            if key == 'power':
+                item[key] = self.parse_power(item[key])
             if key == 'productionYear':
                 item[key] = item[key].replace(' ', '')
 
         return item
 
-    def parse_displacement(self, data: str) -> str:
+    def parse_displacement(self, data: str) -> int:
         data = data.replace(' ', '')
         data = data.replace('cm³', '')
 
-        return data
+        return int(data)
 
     def parse_date(self, date: str) -> datetime:
         if 'dzisiaj' in date.lower():
@@ -56,6 +60,17 @@ class CarCleanPipeline:
         input = date_tokens[2] + '/' + str(self.month_map[date_tokens[1]]) + '/' + date_tokens[0]
 
         return datetime.datetime.strptime(input, format)
+
+    def parse_price(self, price: str) -> int:
+        price_tokens = price.split(' ')
+        return int(price_tokens[0] + price_tokens[1])
+
+    def parse_power(self, power: str):
+        if power is None:
+            return power
+
+        power_tokens = power.split(' ')
+        return int(power_tokens[0])
 
 
 class CarMongoPipeline:
