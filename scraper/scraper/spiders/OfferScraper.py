@@ -10,15 +10,20 @@ from pymongo import MongoClient
 client = MongoClient(host='localhost', port=27017, username='root', password='123')
 base_url = 'https://olx.pl'
 
-def get_urls(**kwargs) -> list[str]:
+def get_urls(**kwargs):
+    urls = []
+
     db = client['rubbler']
     cars_collection = db['cars']
 
-    car = cars_collection.find_one({'model': kwargs['model']})
+    cars = cars_collection.find()
+    for car in cars:
+        if car['make'] == 'alfa romeo':
+            car['make'] = 'alfa-romeo'
+        url = create_url(car['make'], [car['model']])
+        urls.append(url)
 
-    url = create_url(car['make'], [car['model']])
-
-    return [url]
+    return urls
 
 
 class OfferscraperSpider(scrapy.Spider):
@@ -26,8 +31,8 @@ class OfferscraperSpider(scrapy.Spider):
     allowed_domains = ['olx.pl']
 
     def start_requests(self):
-        #urls = get_urls(model='prelude')
-        urls = ['https://www.olx.pl/d/motoryzacja/samochody/bmw/?search%5Bfilter_enum_model%5D%5B0%5D=3-as-sorozat']
+        urls = get_urls(model='prelude')
+        #urls = ['https://www.olx.pl/d/motoryzacja/samochody/honda/prelude']
 
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
