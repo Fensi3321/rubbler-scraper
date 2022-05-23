@@ -10,6 +10,7 @@ import logging
 
 from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
+from pymongo.errors import DuplicateKeyError
 import pymongo
 
 
@@ -91,15 +92,11 @@ class CarMongoPipeline:
         self.db = mongo['rubbler']
 
     def process_item(self, item, spider):
-        valid = True
-
-        for data in item:
-            if not data:
-                valid = False
-                raise DropItem("Missing {0}!".format(data))
-
-        if valid:
+        try:
             self.db['offers'].insert_one(dict(item))
-            logging.info('Offer added to MongoDB database!')
+        except DuplicateKeyError:
+            pass
+
+        logging.info('Offer added to MongoDB database!')
 
         return item

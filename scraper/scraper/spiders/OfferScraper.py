@@ -1,9 +1,7 @@
-import datetime
 import logging
 import scrapy
 
 from ..util.url_utils import create_url
-from hashlib import md5
 from ..items import OfferItem
 from pymongo import MongoClient
 
@@ -18,8 +16,6 @@ def get_urls(**kwargs):
 
     cars = cars_collection.find()
     for car in cars:
-        if car['make'] == 'alfa romeo':
-            car['make'] = 'alfa-romeo'
         url = create_url(car['make'], [car['model']])
         urls.append(url)
 
