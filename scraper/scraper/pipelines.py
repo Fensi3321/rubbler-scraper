@@ -11,6 +11,7 @@ import logging
 from itemadapter import ItemAdapter
 from scrapy.exceptions import DropItem
 from pymongo.errors import DuplicateKeyError
+from scrapy.utils.project import get_project_settings
 import pymongo
 
 
@@ -88,14 +89,16 @@ class CarCleanPipeline:
 
 class CarMongoPipeline:
     def __init__(self):
-        mongo = pymongo.MongoClient(host='localhost', port=27017, username='root', password='123')
+        settings = get_project_settings()
+        mongo = pymongo.MongoClient(host=settings['MONGO_HOST'], port=27017, username=settings['MONGO_USER'], password=settings['MONGO_PASSWORD'])
         self.db = mongo['rubbler']
 
     def process_item(self, item, spider):
         try:
             self.db['offers'].insert_one(dict(item))
         except DuplicateKeyError:
-            pass
+            logging.info('Duplicate offer!')
+            return item
 
         logging.info('Offer added to MongoDB database!')
 

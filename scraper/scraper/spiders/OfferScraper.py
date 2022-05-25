@@ -4,8 +4,10 @@ import scrapy
 from ..util.url_utils import create_url
 from ..items import OfferItem
 from pymongo import MongoClient
+from scrapy.utils.project import get_project_settings
 
-client = MongoClient(host='localhost', port=27017, username='root', password='123')
+settings = get_project_settings()
+client = MongoClient(host=settings['MONGO_HOST'], port=27017, username=settings['MONGO_USER'], password=settings['MONGO_PASSWORD'])
 base_url = 'https://olx.pl'
 
 def get_urls(**kwargs):

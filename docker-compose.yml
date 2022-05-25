@@ -1,5 +1,10 @@
 version: '3.3'
 services:
+  scraper:
+    image: bfs/scraper
+    depends_on:
+      - mongo
+
   mongo:
     image: mongo
     restart: always
